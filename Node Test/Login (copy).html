@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9fafa; /* Fallback color */
+            position: relative;
+            
+        }
+
+        .login-container {
+            position: relative; /* Ensure relative positioning for absolute child */
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 380px; /* Increase the width */
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        .logo1 {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            width: 100px;
+            height: auto;
+            animation: rotateLogo 4s linear infinite; /* Animation properties */
+        }
+
+        @keyframes rotateLogo {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+            text-align: left;
+            padding: 0 10px; /* Add padding to create space around input fields */
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px; /* Adjusted margin */
+        }
+
+        .input-group input {
+            width: calc(100% - 20px); /* Adjust width to account for padding */
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+        }
+
+        button {
+            width: calc(100% - 20px); /* Adjust width to account for padding */
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #094744;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 0 10px; /* Add margin to match input-group padding */
+        }
+
+        button:hover {
+            background-color: #0d7a75;
+        }
+    </style>
+</head>
+<body>
+    <img src="logo1.png" alt="Logo" class="logo1">
+    <div class="login-container">
+        <h2>Login</h2>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Simple validation
+            if (username === 'admin' && password === 'password') {
+                // Redirect to master.html on successful login
+                window.location.href = 'master.html';
+            } else {
+                alert('Invalid username or password.');
+            }
+        });
+    </script>
+</body>
+</html>

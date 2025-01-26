@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Comparison</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+        }
+
+        .logo1 {
+            width: 100px;
+            height: auto;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .rotate {
+            animation: rotateLogo 5s linear infinite;
+        }
+
+        @keyframes rotateLogo {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .buttons {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .buttons button {
+            width: 200px;
+            padding: 15px;
+            border: 0.7px solid black;
+            background-color: #0d7a75;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            border-radius: 10px;
+            margin: 0 10px;
+        }
+
+        .buttons button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .buttons button:active {
+            background-color: #d0d0d0;
+            transform: scale(0.95);
+        }
+
+        .master-section {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .master-section h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: rgb(10, 10, 10);
+        }
+
+        .master-section button {
+            width: 150px;
+            padding: 10px;
+            border: 0.7px solid black;
+            background-color: #0d7a75;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            border-radius: 5px;
+        }
+
+        .master-section button:hover {
+            background-color: #e0e0e0;
+        }
+
+        .master-section button:active {
+            background-color: #d0d0d0;
+            transform: scale(0.95);
+        }
+
+        .recording-status {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .passLogo, .failLogo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            width: 150px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="recording-status">
+        <!-- Recording light or status indicator -->
+    </div>
+    <img src="logo1.png" alt="Logo" class="logo1" id="logo1">
+    <div class="buttons">
+        <button id="record-master">Start</button>
+        <button id="stop-test">Stop</button>
+    </div>
+    <div class="master-section">
+        <h1 id="m">Master Value</h1>
+        <button id="set-new-master">Set New Master</button>
+    </div>
+    <img src="passLogo.png" alt="Pass" class="passLogo" id="pass-logo">
+    <img src="failLogo.png" alt="Fail" class="failLogo" id="fail-logo">
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.emit("msg","msg")
+        const startButton = document.getElementById('record-master');
+        const stopButton = document.getElementById('stop-test');
+        const logo = document.getElementById('logo1');
+        const passLogo = document.getElementById('pass-logo');
+        const failLogo = document.getElementById('fail-logo');
+        socket.on('chat message', (msg) => {
+        console.log("rec-",msg)
+        
+        // const item = document.createElement('li');
+        // item.textContent = msg;
+        const data = msg
+        const masterFrequencyMatch = data.match(/Master Frequency = ([0-9.]+) Hz/);
+
+        // get master data
+        if (masterFrequencyMatch && masterFrequencyMatch[1]) {
+        const masterFrequency = masterFrequencyMatch[1];
+        console.log(masterFrequency); // Output: 429.00
+        document.getElementById("m").innerHTML = "Master Value: " + masterFrequency + " Hz"
+        } else {
+        console.log('Master Frequency not found');
+        }
+        // get test data
+        const testFrequencyMatch = data.match(/Test Frequency = ([0-9.]+) Hz/);
+
+        if (testFrequencyMatch && testFrequencyMatch[1]) {
+        const testFrequency = testFrequencyMatch[1];
+        console.log(testFrequency); // Output: 5000.00
+        } else {
+        console.log('Test Frequency not found');
+        }
+        // check Match or Mismatch
+        if (data.includes("Mismatched")) {
+        console.log("String contains 'Mismatched'");
+        showResultLogo(false);
+        } else if(data.includes("Matched")) {
+        console.log("String does not contain 'Mismatched'");
+        showResultLogo(true);
+        }
+        else{
+
+        }
+    });
+        function showResultLogo(isPass) {
+            passLogo.style.display = 'none';
+            failLogo.style.display = 'none';
+            const logoToShow = isPass ? passLogo : failLogo;
+            logoToShow.style.display = 'block';
+
+            setTimeout(() => {
+                logoToShow.style.display = 'none';
+            }, isPass ? 5000 : 3000);
+        }
+
+        startButton.addEventListener('click', () => {
+            logo.classList.add('rotate');
+            // Simulate comparison result for demonstration purposes
+            socket.emit('starttest', 'compare');
+            // const comparisonResult = Math.random() > 0.5; // Replace with actual comparison logic
+            // showResultLogo(comparisonResult);
+        });
+
+        stopButton.addEventListener('click', () => {
+            logo.classList.remove('rotate');
+            socket.emit('stoptest', 'stop all');
+        });
+
+        const setNewMasterButton = document.getElementById('set-new-master');
+
+        setNewMasterButton.addEventListener('click', () => {// Navigate to your login page
+    window.location.href = 'Login.html'; // Replace 'login.html' with your actual login page URL
+
+   
+});
+    </script>
+</body>
+</html>
